@@ -45,7 +45,7 @@ const consumerQueue = async (channel, queueName) => {
              * 1. find user following that SHOP
              * 2. send message to user
              * 3. yes, ok ==> success
-             * 4. no, ok ==> failed
+             * 4. no, setup DLX(Dead Letter Exchange) and DLQ(Dead Letter Queue)
             */
         }, { noAck: true });
     } catch (error) {
