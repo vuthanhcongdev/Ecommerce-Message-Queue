@@ -26,13 +26,35 @@ const messageService = {
 
             const notificationQueue = 'notification_queue_process'; // assertQueue
 
-            const timeExpried = 15000;
-            setTimeout(() => {
-                channel.consume(notificationQueue, (message) => {
-                    console.log(`Received message from ${notificationQueue}: ${message.content.toString()}`);
+            // const timeExpried = 15000;
+            // setTimeout(() => {
+            //     channel.consume(notificationQueue, (message) => {
+            //         console.log(`Received message from ${notificationQueue}: ${message.content.toString()}`);
+            //         channel.ack(message);
+            //     });
+            // }, timeExpried);
+
+            channel.consume(notificationQueue, (message) => {
+                try {
+                    const numberTest = Math.random();
+                    console.log('numberTest: ', numberTest);
+                    if (numberTest < 0.5) {
+                        throw new Error('Send notification error, HOT FIX NOW');
+                    }
+
+                    console.log(`Received message from ${notificationQueue}`, message.content.toString());
                     channel.ack(message);
-                });
-            }, timeExpried);
+                } catch (error) {
+                    console.log(`Error processing message: ${error.message}`);
+                    channel.nack(message, false, false);
+                    /**
+                     * nack: negative acknowledgment
+                     * false (1): xem có cần phải đẩy lại vào queue trước đó hay sẽ đẩy vào queue dlx (true: cần, false: không cần)
+                     * false (2): chỉ tin nhắn hiện tại, true: tất cả tin nhắn cùng lúc bị bỏ qua
+                    */
+                }
+                
+            });
 
         } catch (error) {
             console.error('Error consume to queue: ', error);
